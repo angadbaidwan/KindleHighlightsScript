@@ -48,14 +48,12 @@ namespace KindleHighlightsScript
                 {
                     // Read highlight/bookmark entry
                     string bookTitleLine = reader.ReadLine();
+                    if (String.IsNullOrEmpty(bookTitleLine))
+                        break;
                     string pageDateLine = reader.ReadLine();
                     reader.ReadLine();
                     string quoteLine = reader.ReadLine();
-
-                    // stop reading file if divider contains '.'
-                    string divider = reader.ReadLine();
-                    if (divider.Contains('.'))
-                        break;
+                    reader.ReadLine();
 
                     // Parse Date for validation
                     string[] temp = pageDateLine.Split("Added on ");
