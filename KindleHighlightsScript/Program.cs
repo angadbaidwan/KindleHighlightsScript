@@ -28,7 +28,7 @@ namespace KindleHighlightsScript
         public static bool ValidateDateRange(DateTime dateIn)
         {
             // NOTE: !Hardcoded Date Validation!
-            DateTime startDate = new DateTime(2023, 1, 1);
+            DateTime startDate = new DateTime(2023, 2, 1);
             DateTime endDate = new DateTime(2023, 3, 1);
             if (dateIn >= startDate && dateIn <= endDate)
                 return true;
@@ -62,11 +62,15 @@ namespace KindleHighlightsScript
                     // Check if highlight, quote is more than one word, and quote matches date range
                     if (pageDateLine.Contains("Highlight") && quoteLine.Contains(' ') && ValidateDateRange(dateCreated))
                     {
-                        string pattern = @"\d+";
-                        int pageNum = Int32.Parse(Regex.Match(pageDateLine, pattern).ToString());
+                        string pageNumPattern = @"\d+";
+                        int pageNum = Int32.Parse(Regex.Match(pageDateLine, pageNumPattern).ToString());
+
+                        // Update book name to remove illegal file name characters
+                        string bookTitlePattern = @"[\\/*?<>|""]";
+                        bookTitleLine = Regex.Replace(bookTitleLine.Replace(":", " -"), bookTitlePattern, String.Empty); // using 2 different Regex overloads
 
                         // Create book highlight and add to list
-                        var bookHighlight = new BookHighlight(quoteLine, bookTitleLine.Replace(":", " -"), dateCreated, pageNum);
+                        var bookHighlight = new BookHighlight(quoteLine, bookTitleLine, dateCreated, pageNum);
                         bookHighlights.Add(bookHighlight);
                     }
                 }
@@ -74,6 +78,10 @@ namespace KindleHighlightsScript
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                reader.Close();
             }
 
             // Group highlights by book
@@ -98,10 +106,13 @@ namespace KindleHighlightsScript
                 {
                     Console.WriteLine(ex.Message);
                 }
-                writer.Close();
+                finally
+                {
+                    writer.Close();
+                }
             }
+            
 
-            reader.Close();
         }
     }
 }
