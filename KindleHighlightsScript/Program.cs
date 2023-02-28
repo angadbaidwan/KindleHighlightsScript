@@ -28,7 +28,7 @@ namespace KindleHighlightsScript
         public static bool ValidateDateRange(DateTime dateIn)
         {
             // NOTE: !Hardcoded Date Validation!
-            DateTime startDate = new DateTime(2023, 2, 1);
+            DateTime startDate = new DateTime(2023, 2, 10);
             DateTime endDate = new DateTime(2023, 3, 1);
             if (dateIn >= startDate && dateIn <= endDate)
                 return true;
@@ -52,8 +52,12 @@ namespace KindleHighlightsScript
                         break;
                     string pageDateLine = reader.ReadLine();
                     reader.ReadLine();
-                    string quoteLine = reader.ReadLine();
-                    reader.ReadLine();
+                    string quoteLine = "", tempLine = "";
+                    do
+                    {
+                        quoteLine += tempLine;
+                        tempLine = reader.ReadLine();
+                    } while (!tempLine.Equals("=========="));
 
                     // Parse Date for validation
                     string[] temp = pageDateLine.Split("Added on ");
